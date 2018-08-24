@@ -1,3 +1,6 @@
+//test 
+'use strict';
+
 const STORE = [];
 
 // User input is captured and stored into a datastore
