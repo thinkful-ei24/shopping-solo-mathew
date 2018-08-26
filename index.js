@@ -83,10 +83,14 @@ function handleAddItem() {
     // Clear out the value of the input so new items can be addeed
     inputObject.val('');
     // Update the store
-    addItemToStore({ name: newListItem, completed: false, filtered: false });
+    addItemToStore({ itemId: getNewItemNumber(), name: newListItem, completed: false, filtered: false });
     // Rerender the shopping list
     renderShoppingList();
   });
+}
+
+function getNewItemNumber() {
+  return STORE.items.length + 1;
 }
 
 function listItemToHTML(itemObject, itemIndex) {
