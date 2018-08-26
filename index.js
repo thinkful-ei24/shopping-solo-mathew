@@ -7,15 +7,16 @@
 
 
 
-// User can edit the title of an item
-
-
 
 
 //DONE change code to utilize new STORE data structure
 //DONE new STORE = object with items list. displayAllCheckedToggle. 
 const STORE = {
-  items: [ {name: 'apple', completed: false, filtered: false}, {name: 'banana', completed: true, filtered: false}, {name: 'pineapple', completed: false, filtered: false} ],
+  items: [ 
+    {itemId: 1, name: 'apple', completed: false, filtered: false}, 
+    {itemId: 2, name: 'banana', completed: true, filtered: false}, 
+    {itemId: 3, name: 'pineapple', completed: false, filtered: false}
+  ],
   removeCheckedItems: false,
   searchTerm: ''
 };
@@ -45,7 +46,6 @@ function handleDeleteItemClicked() {
   });
 }
 
-//BUG: Click Removed Checkbox -> Click check on one item -> Click check on another item and the first item toggles back
 // You should be able to check items on the list
 function handleItemCheckClicked() {
   // Need to use event delegation Listen for when a user clicks the check button
@@ -68,6 +68,9 @@ function toggleCheckedForListItem(index) {
   // Set value of boolean to opposite of boolean
   STORE.items[index].completed = !STORE.items[index].completed;
 }
+
+//Need to add ItemID to addItemToStore
+//new function: getNextItemId()
 
 // Handle submit event listener
 function handleAddItem() {
@@ -105,7 +108,7 @@ function listItemToHTML(itemObject, itemIndex) {
   // return generated html
   return `
   <li data-item-index="${itemIndex}">
-    <span class="shopping-item ${checkedStatus}">${itemObject.name}</span>
+    <span class="shopping-item js-data-editable ${checkedStatus}">${itemObject.name}</span>
     <div class="shopping-item-controls">
       <button class="shopping-item-toggle">
         <span class="button-label">check</span>
@@ -125,6 +128,7 @@ function handleShowAllvsShowChecked() {
   });
 }
 
+//REMOVE
 function getUncompletedItems() {
   let checkedItems = [];
   checkedItems = STORE.items.filter((item) => item.completed === false);
@@ -155,24 +159,81 @@ function handleSearchClicked() {
     renderShoppingList();
 
   });
+
+  function addSearchTermToStore(searchItem) {
+    STORE.searchTerm = searchItem;
+  }
+  
 }
 
-function addSearchTermToStore(searchItem) {
-  STORE.searchTerm = searchItem;
-}
 
-function searchForItems(itemsToSearch) {
-  return itemsToSearch.filter( item => item.name === STORE.searchTerm);
+function handleEditTitle() {
+  //console.log('handler')
+  $('.container').on('click', '.js-data-editable', function(){
+    
+    
+    //get new name data
+    //put data into store
+    changeTitleText( $(this) );
+
+  
+    //rendering breaks the function
+    //renderShoppingList();
+ 
+  });
+
+  function updateStoreItemName(itemID, newName) {
+    for (let i = 0; i < STORE.items.length; i++) {
+      if (STORE.items[i]['itemId'] === itemID) {
+        STORE.items[i]['name'] = newName;
+      }
+    }
+  }
+
+  function lookUpItemId(textFromPage) {
+    let itemId;
+    
+    for (let i = 0; i < STORE.items.length; i++) {
+      if (STORE.items[i]['name'] === textFromPage) {
+        itemId = STORE.items[i]['itemId'];
+      }
+    }
+
+    return itemId;
+  }
+
+  function changeTitleText(element) {
+    //look up item ID of the existing name
+    let itemIDofChangedItem = lookUpItemId(element.text());
+   
+    //Change the text on the page
+    let input = $('<input/>').val( element.text() );
+    
+    element.replaceWith( input );
+      
+    const save = function(){
+      let p = $('<span class="shopping-item js-data-editable" />').text( input.val() );
+      input.replaceWith( p );
+      //Update the store with the new Item Name
+      updateStoreItemName(itemIDofChangedItem, input.val());
+    };
+      
+    /**
+      We're defining the callback with `one`, because we know that
+      the element will be gone just after that, and we don't want 
+      any callbacks leftovers take memory. 
+      Next time `p` turns into `input` this single callback 
+      will be applied again.
+    */
+    input.one('blur', save).focus();
+  }
+  
 }
 
 // Shopping list should be rendered to the page
 function renderShoppingList() {
   // loop through store using map to generate html to be placed on page
   let items = STORE.items;
-
-  //if (STORE.searchTerm !== '') {
-  //  items = searchForItems(items);
-  //}
 
   items = items.map(listItemToHTML);
   
@@ -189,6 +250,7 @@ function handleShoppingList() {
   handleDeleteItemClicked();
   handleShowAllvsShowChecked();
   handleSearchClicked();
+  handleEditTitle();
 }
 
 $(handleShoppingList);
