@@ -4,7 +4,10 @@
 // DONE User can press a switch/checkbox to toggle between displaying all items or displaying only items that are unchecked
 //   DONE Need a switch or checkbox on the HTML
 
-
+// Items I want to add: 
+//  1. Add a Clear Search button
+//  2. Change check button text to "uncheck" if it's checked
+//  3. Search dynamically
 
 
 
